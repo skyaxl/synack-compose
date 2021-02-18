@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  registry:
+    build: ./synack-registry
+    ports:
+      - "9000:9000"
+    environment:
+      - APP_PORT=9000
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://registry:9000/ping"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+        start_period: 30s
+  proxy:
+    build: ./synack-proxy
+    links:
+      - registry
+    ports:
+      - "9001:8080"
+    environment: 
+      - REGISTRY_URL=http://registry:9000/
